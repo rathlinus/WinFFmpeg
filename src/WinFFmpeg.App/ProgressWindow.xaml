@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="WinFFmpeg.App.ProgressWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinFFmpeg.App"
+    Title="WinFFmpeg">
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TitleBar x:Name="AppTitleBar" Title="WinFFmpeg">
+            <TitleBar.IconSource>
+                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
+            </TitleBar.IconSource>
+        </TitleBar>
+
+        <StackPanel Grid.Row="1" Margin="20,8,20,12" Spacing="12">
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Queue.Header, Mode=OneWay}" />
+            <!-- With a single file its own bar already says everything. -->
+            <ProgressBar Visibility="{x:Bind Queue.HasSeveralJobs, Mode=OneWay}" Value="{x:Bind Queue.OverallProgress, Mode=OneWay}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" Padding="12,0,12,8">
+            <ItemsRepeater ItemsSource="{x:Bind Queue.Jobs}">
+                <ItemsRepeater.Layout>
+                    <StackLayout Spacing="4" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:JobViewModel">
+                        <Border Style="{StaticResource CardStyle}" Padding="12,10" MinHeight="0">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <FontIcon
+                                    Margin="0,3,0,0"
+                                    VerticalAlignment="Top"
+                                    FontSize="16"
+                                    Glyph="{x:Bind Glyph, Mode=OneWay}" />
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{x:Bind FileName}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind StatusText, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        Visibility="{x:Bind IsNotFailed, Mode=OneWay}" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                        MaxLines="3"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind StatusText, Mode=OneWay}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="Wrap"
+                                        Visibility="{x:Bind IsFailed, Mode=OneWay}" />
+                                    <ProgressBar
+                                        Margin="0,6,0,2"
+                                        IsIndeterminate="{x:Bind IsIndeterminate, Mode=OneWay}"
+                                        Visibility="{x:Bind IsRunning, Mode=OneWay}"
+                                        Value="{x:Bind ProgressValue, Mode=OneWay}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Top" Orientation="Horizontal">
+                                    <Button
+                                        AutomationProperties.Name="Show details"
+                                        Click="OnDetailsClick"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="Show what ffmpeg reported"
+                                        Visibility="{x:Bind HasLog, Mode=OneWay}">
+                                        <FontIcon FontSize="14" Glyph="&#xE946;" />
+                                    </Button>
+                                    <Button
+                                        AutomationProperties.Name="Show in folder"
+                                        Click="OnRevealClick"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="Show in folder"
+                                        Visibility="{x:Bind CanReveal, Mode=OneWay}">
+                                        <FontIcon FontSize="14" Glyph="&#xE838;" />
+                                    </Button>
+                                    <Button
+                                        AutomationProperties.Name="Cancel this file"
+                                        Click="OnCancelJobClick"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="Cancel"
+                                        Visibility="{x:Bind CanCancel, Mode=OneWay}">
+                                        <FontIcon FontSize="14" Glyph="&#xE711;" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+
+        <Grid
+            Grid.Row="3"
+            Padding="20,12"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0">
+            <Button
+                Click="OnOpenFolderClick"
+                Content="Open folder"
+                IsEnabled="{x:Bind Queue.HasOutput, Mode=OneWay}" />
+            <Button
+                MinWidth="96"
+                HorizontalAlignment="Right"
+                Click="OnCancelAllClick"
+                Content="Cancel"
+                Visibility="{x:Bind Queue.IsBusy, Mode=OneWay}" />
+            <Button
+                MinWidth="96"
+                HorizontalAlignment="Right"
+                Click="OnCloseClick"
+                Content="Close"
+                Style="{StaticResource AccentButtonStyle}"
+                Visibility="{x:Bind Queue.IsIdle, Mode=OneWay}" />
+        </Grid>
+    </Grid>
+</Window>

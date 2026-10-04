@@ -1,8 +1,8 @@
-# Using FFConvert
+# Using WinFFmpeg
 
 ## The right-click menu
 
-Select one or more files in Explorer, right-click and open **Convert with FFConvert**. The entry is only there when the selection contains a file FFConvert can read:
+Select one or more files in Explorer, right-click and open **Convert with WinFFmpeg**. The entry is only there when the selection contains a file WinFFmpeg can read:
 
 | Kind | Extensions |
 |---|---|
@@ -60,7 +60,7 @@ Right-clicking more files while a conversion runs adds them to the same window.
   <img src="screenshots/convert.png" width="560" alt="The convert window">
 </p>
 
-**Custom…** opens this window with the selected files. You can also start FFConvert from the Start menu and drop files on it, or use **Add files**.
+**Custom…** opens this window with the selected files. You can also start WinFFmpeg from the Start menu and drop files on it, or use **Add files**.
 
 Only the options that apply to the chosen format are shown.
 
@@ -110,11 +110,11 @@ Presets are listed in Settings under "Your presets", where the bin icon deletes 
 
 ### ffmpeg location
 
-FFConvert looks for `ffmpeg.exe` in the folder chosen here, then on `PATH`, then in the WinGet links folder, `C:\ffmpeg\bin` and `%ProgramFiles%\ffmpeg\bin`. When it finds none, the page offers to install ffmpeg with winget. `ffprobe.exe` is expected in the same folder. Without it conversions still run, but the progress bar cannot show a percentage.
+WinFFmpeg looks for `ffmpeg.exe` in the folder chosen here, then on `PATH`, then in the WinGet links folder, `C:\ffmpeg\bin` and `%ProgramFiles%\ffmpeg\bin`. When it finds none, the page offers to install ffmpeg with winget. `ffprobe.exe` is expected in the same folder. Without it conversions still run, but the progress bar cannot show a percentage.
 
 ### Use the graphics card for H.264 and HEVC
 
-This is off by default. When it is on, FFConvert encodes with NVENC, Quick Sync or AMF, whichever works on your hardware. It finds out by encoding a few frames with each. GPU encoders are usually faster than the processor and produce somewhat larger files at the same quality step. A file the GPU encoder rejects is converted again on the processor.
+This is off by default. When it is on, WinFFmpeg encodes with NVENC, Quick Sync or AMF, whichever works on your hardware. It finds out by encoding a few frames with each. GPU encoders are usually faster than the processor and produce somewhat larger files at the same quality step. A file the GPU encoder rejects is converted again on the processor.
 
 ### Save to
 
@@ -122,19 +122,23 @@ Converted files go next to the original unless you choose one folder for all of 
 
 ### Notify me when conversions finish
 
-FFConvert shows a Windows notification when the queue is done and the progress window is not in front. Clicking it opens the folder.
+WinFFmpeg shows a Windows notification when the queue is done and the progress window is not in front. Clicking it opens the folder.
 
 ### Close the progress window when done
 
 Turn this off to keep the window open after a successful run.
 
+### About
+
+The card at the bottom of the page shows the installed version and links to the source code and the issue tracker. Include the version when you report a problem.
+
 ## From a terminal
 
-Installing FFConvert also adds the `ffconvert` command.
+Installing WinFFmpeg also adds the `winffmpeg` command.
 
 ```powershell
-ffconvert clip.mkv                         # open the custom window with this file
-ffconvert --run video-mp4-h264 a.mkv b.mov # run a preset on these files
+winffmpeg clip.mkv                         # open the custom window with this file
+winffmpeg --run video-mp4-h264 a.mkv b.mov # run a preset on these files
 ```
 
 The ids of the built-in entries are `video-mp4-h264`, `video-mp4-hevc`, `video-webm`, `video-gif`, `audio-mp3`, `audio-flac`, `audio-wav`, `audio-opus`, `image-png`, `image-jpg` and `image-webp`. `--run compress` and `--run custom` open the custom window.

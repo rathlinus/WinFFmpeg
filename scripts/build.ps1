@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Builds FFConvert: the shell extension first, then the app as an MSIX package.
+    Builds WinFFmpeg: the shell extension first, then the app as an MSIX package.
 
 .DESCRIPTION
-    Writes artifacts\FFConvert.msix. The package is unsigned; sign.ps1 signs it
+    Writes artifacts\WinFFmpeg.msix. The package is unsigned; sign.ps1 signs it
     and install.ps1 signs and installs it.
 
 .PARAMETER Configuration
@@ -47,7 +47,7 @@ $stampedManifest = Join-Path $Artifacts 'obj\Package.appxmanifest'
 New-Item -ItemType Directory -Force (Split-Path $stampedManifest) | Out-Null
 $manifest = New-Object xml
 $manifest.PreserveWhitespace = $true
-$manifest.Load((Join-Path $RepoRoot 'src\FFConvert.App\Package.appxmanifest'))
+$manifest.Load((Join-Path $RepoRoot 'src\WinFFmpeg.App\Package.appxmanifest'))
 $manifest.Package.Identity.Version = $Version.ToString(4)
 $manifest.Save($stampedManifest)
 
@@ -58,7 +58,7 @@ $env:PATH = "$env:PATH;$(Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual St
 
 Write-Host 'Publishing the shell extension (Native AOT)...'
 Invoke-Native dotnet @(
-    'publish', (Join-Path $RepoRoot 'src\FFConvert.Shell\FFConvert.Shell.csproj'),
+    'publish', (Join-Path $RepoRoot 'src\WinFFmpeg.Shell\WinFFmpeg.Shell.csproj'),
     '-c', 'Release', '-o', (Join-Path $Artifacts 'shell'), '--nologo', '-v:q')
 
 Write-Host "Building the app package $Version ($Configuration)..."
@@ -68,7 +68,7 @@ if (Test-Path $packageDir) { Remove-Item $packageDir -Recurse -Force }
 # The trailing separator is required by the packaging targets. A forward slash
 # is used because a backslash before the closing quote would escape it.
 Invoke-Native dotnet @(
-    'build', (Join-Path $RepoRoot 'src\FFConvert.App\FFConvert.App.csproj'),
+    'build', (Join-Path $RepoRoot 'src\WinFFmpeg.App\WinFFmpeg.App.csproj'),
     '-c', $Configuration, '-p:Platform=x64', '--nologo', '-v:q',
     '-p:GenerateAppxPackageOnBuild=true',
     '-p:AppxPackageSigningEnabled=false',

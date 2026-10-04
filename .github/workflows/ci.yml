@@ -28,7 +28,7 @@ jobs:
         run: choco install ffmpeg --no-progress -y
 
       - name: Test
-        run: dotnet test tests/FFConvert.Core.Tests
+        run: dotnet test tests/WinFFmpeg.Core.Tests
 
       # Windows PowerShell, because that is what the scripts are written for and tested with.
       - name: Build the package
@@ -37,6 +37,6 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: FFConvert-unsigned
-          path: artifacts/FFConvert.msix
+          name: WinFFmpeg-unsigned
+          path: artifacts/WinFFmpeg.msix
           if-no-files-found: error

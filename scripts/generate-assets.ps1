@@ -15,7 +15,7 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 if (-not $OutputFolder) {
-    $OutputFolder = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\src\FFConvert.App\Assets'
+    $OutputFolder = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\src\WinFFmpeg.App\Assets'
 }
 
 New-Item -ItemType Directory -Force $OutputFolder | Out-Null
@@ -32,35 +32,49 @@ function New-IconBitmap([int]$Width, [int]$Height, [double]$IconSize) {
     [single]$x = ($Width - $IconSize) / 2
     [single]$y = ($Height - $IconSize) / 2
     [single]$s = $IconSize
-    [single]$d = $s * 0.46   # corner diameter
 
-    $plate = New-Object System.Drawing.Drawing2D.GraphicsPath
-    $plate.AddArc($x, $y, $d, $d, 180, 90)
-    $plate.AddArc($x + $s - $d, $y, $d, $d, 270, 90)
-    $plate.AddArc($x + $s - $d, $y + $s - $d, $d, $d, 0, 90)
-    $plate.AddArc($x, $y + $s - $d, $d, $d, 90, 90)
-    $plate.CloseFigure()
+    # Four tiles in the arrangement of the Windows logo.
+    [single]$gap = $s * 0.06
+    [single]$tile = ($s - $gap) / 2
+    [single]$d = $tile * 0.24   # corner diameter
+    $tiles = New-Object System.Drawing.Drawing2D.GraphicsPath
+    foreach ($row in 0, 1) {
+        foreach ($column in 0, 1) {
+            [single]$tx = $x + $column * ($tile + $gap)
+            [single]$ty = $y + $row * ($tile + $gap)
+            $tiles.StartFigure()
+            $tiles.AddArc($tx, $ty, $d, $d, 180, 90)
+            $tiles.AddArc($tx + $tile - $d, $ty, $d, $d, 270, 90)
+            $tiles.AddArc($tx + $tile - $d, $ty + $tile - $d, $d, $d, 0, 90)
+            $tiles.AddArc($tx, $ty + $tile - $d, $d, $d, 90, 90)
+            $tiles.CloseFigure()
+        }
+    }
 
+    # ffmpeg green, a little lighter in the top left than in the bottom right.
     $from = New-Object System.Drawing.PointF $x, $y
     $to = New-Object System.Drawing.PointF ($x + $s), ($y + $s)
     $brush = New-Object System.Drawing.Drawing2D.LinearGradientBrush $from, $to,
-        ([System.Drawing.Color]::FromArgb(255, 46, 144, 255)), ([System.Drawing.Color]::FromArgb(255, 112, 72, 232))
-    $g.FillPath($brush, $plate)
+        ([System.Drawing.Color]::FromArgb(255, 84, 184, 84)), ([System.Drawing.Color]::FromArgb(255, 40, 138, 46))
+    $g.FillPath($brush, $tiles)
 
-    # Two opposing arrows: one thing turning into another.
-    $pen = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), ([single]($s * 0.09))
+    # The zigzag scan order video codecs read a block in, which is also the motif of
+    # the ffmpeg logo. Every size draws this same shape; there is no simplified
+    # variant for small icons.
+    function P([double]$fx, [double]$fy) { New-Object System.Drawing.PointF ([single]($x + $s * $fx)), ([single]($y + $s * $fy)) }
+
+    $a = 0.2; $b = 0.5; $c = 0.8
+    $points = (P $a $a), (P $b $a), (P $a $b), (P $a $c), (P $b $b), (P $c $a), (P $c $b), (P $b $c), (P $c $c)
+
+    # Proportional to the icon, but never thinner than the line needs to stay visible at 16 pixels.
+    [single]$stroke = [Math]::Max($s * 0.075, 1.4)
+    $pen = New-Object System.Drawing.Pen ([System.Drawing.Color]::White), $stroke
     $pen.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
     $pen.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
     $pen.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
+    $g.DrawLines($pen, [System.Drawing.PointF[]]$points)
 
-    function P([double]$fx, [double]$fy) { New-Object System.Drawing.PointF ([single]($x + $s * $fx)), ([single]($y + $s * $fy)) }
-
-    $g.DrawLine($pen, (P 0.26 0.37), (P 0.74 0.37))
-    $g.DrawLines($pen, [System.Drawing.PointF[]]@((P 0.62 0.25), (P 0.74 0.37), (P 0.62 0.49)))
-    $g.DrawLine($pen, (P 0.74 0.63), (P 0.26 0.63))
-    $g.DrawLines($pen, [System.Drawing.PointF[]]@((P 0.38 0.51), (P 0.26 0.63), (P 0.38 0.75)))
-
-    $pen.Dispose(); $brush.Dispose(); $plate.Dispose(); $g.Dispose()
+    $pen.Dispose(); $brush.Dispose(); $tiles.Dispose(); $g.Dispose()
     return $bitmap
 }
 
@@ -69,6 +83,9 @@ function Save-Png([string]$Name, [int]$Width, [int]$Height, [double]$IconSize) {
     $bitmap.Save((Join-Path $OutputFolder $Name), [System.Drawing.Imaging.ImageFormat]::Png)
     $bitmap.Dispose()
 }
+
+# The logo on its own, for the About card and the README.
+Save-Png 'Logo.png' 256 256 256
 
 # Tiles and logos. The icon fills small squares and sits in the middle of larger tiles.
 Save-Png 'StoreLogo.png' 50 50 50

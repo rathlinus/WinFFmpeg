@@ -1,9 +1,13 @@
-# FFConvert
+<p align="center">
+  <img src="src/WinFFmpeg.App/Assets/Logo.png" width="96" alt="The WinFFmpeg logo: four green tiles with a white zigzag line across them">
+</p>
 
-FFConvert adds a **Convert with FFConvert** entry to the right-click menu in Windows 11 Explorer. Pick a format there and the selected videos, audio files or images are converted with [ffmpeg](https://ffmpeg.org).
+# WinFFmpeg
+
+WinFFmpeg adds a **Convert with WinFFmpeg** entry to the right-click menu in Windows 11 Explorer. Pick a format there and the selected videos, audio files or images are converted with [ffmpeg](https://ffmpeg.org).
 
 <p align="center">
-  <img src="docs/screenshots/context-menu.png" width="760" alt="Explorer's right-click menu with the Convert with FFConvert entry open, listing MP4, WebM, GIF, Extract audio, a saved preset, Compress and Custom">
+  <img src="docs/screenshots/context-menu.png" width="760" alt="Explorer's right-click menu with the Convert with WinFFmpeg entry open, listing MP4, WebM, GIF, Extract audio, a saved preset, Compress and Custom">
 </p>
 
 It is a native WinUI 3 app. It does not contain ffmpeg; it runs the copy installed on your machine.
@@ -16,7 +20,7 @@ Right-click one file or a whole selection and choose a format. The conversion st
   <img src="docs/screenshots/progress.png" width="440" alt="The progress window: one file finished, one at 2 percent with speed and time left, one waiting">
 </p>
 
-Converted files are written next to the originals. FFConvert never replaces an existing file: if `clip.mp4` is taken, the result is called `clip (1).mp4`.
+Converted files are written next to the originals. WinFFmpeg never replaces an existing file: if `clip.mp4` is taken, the result is called `clip (1).mp4`.
 
 **Custom…** opens the full window instead. There you choose the format, codec, quality, resolution, frame rate and a trim range. **Save as preset…** keeps the combination and puts it in the right-click menu, like "Phone (720p, small)" in the first screenshot.
 
@@ -39,7 +43,7 @@ What the menu offers depends on the selection:
 
 You need 64-bit Windows 11 and ffmpeg. If ffmpeg is missing, `winget install Gyan.FFmpeg` installs it.
 
-1. Download `FFConvert-<version>-x64.zip` from the [releases page](https://github.com/rathlinus/WinFFmpeg/releases) and extract it.
+1. Download `WinFFmpeg-<version>-x64.zip` from the [releases page](https://github.com/rathlinus/WinFFmpeg/releases) and extract it.
 2. Open a terminal in the extracted folder and run:
 
    ```powershell
@@ -48,7 +52,7 @@ You need 64-bit Windows 11 and ffmpeg. If ffmpeg is missing, `winget install Gya
 
 The package is signed with a self-signed certificate, which Windows does not trust on its own. `Install.ps1` adds the certificate to the machine's Trusted People store and then installs the package. Adding the certificate needs administrator rights, so expect one prompt. Later versions signed with the same certificate install without it.
 
-To uninstall, open Settings, go to Apps, then Installed apps, and remove FFConvert.
+To uninstall, open Settings, go to Apps, then Installed apps, and remove WinFFmpeg.
 
 ## Build from source
 
@@ -59,4 +63,4 @@ scripts\install.ps1 -Build   # build, sign and install
 
 `setup-dev.ps1` installs the .NET 10 SDK and the MSVC toolset and turns on Developer Mode. [docs/development.md](docs/development.md) explains the projects, the scripts and how a click in Explorer ends up as an ffmpeg process. [docs/releasing.md](docs/releasing.md) covers publishing a version.
 
-FFConvert is an independent project and is not affiliated with FFmpeg.
+WinFFmpeg is an independent project and is not affiliated with FFmpeg or Microsoft.

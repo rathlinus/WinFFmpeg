@@ -4,12 +4,12 @@ $ErrorActionPreference = 'Stop'
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $Artifacts = Join-Path $RepoRoot 'artifacts'
-$PackageName = 'FFConvert'
+$PackageName = 'WinFFmpeg'
 
 # What build.ps1 writes, and what sign.ps1 makes of it.
-$PackagePath = Join-Path $Artifacts 'FFConvert.msix'
-$SignedPackagePath = Join-Path $Artifacts 'FFConvert-signed.msix'
-$CertificatePath = Join-Path $Artifacts 'FFConvert.cer'
+$PackagePath = Join-Path $Artifacts 'WinFFmpeg.msix'
+$SignedPackagePath = Join-Path $Artifacts 'WinFFmpeg-signed.msix'
+$CertificatePath = Join-Path $Artifacts 'WinFFmpeg.cer'
 
 # Finds a Windows SDK tool such as makeappx.exe or signtool.exe: first in the
 # NuGet package the app project restores, then in an installed Windows SDK.

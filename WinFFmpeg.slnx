@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WinFFmpeg.App/WinFFmpeg.App.csproj" />
+    <Project Path="src/WinFFmpeg.Core/WinFFmpeg.Core.csproj" />
+    <Project Path="src/WinFFmpeg.Shell/WinFFmpeg.Shell.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WinFFmpeg.Core.Tests/WinFFmpeg.Core.Tests.csproj" />
+  </Folder>
+</Solution>

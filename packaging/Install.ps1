@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Installs FFConvert for the current user.
+    Installs WinFFmpeg for the current user.
 
 .DESCRIPTION
-    FFConvert is signed with a self-signed certificate, and Windows only
+    WinFFmpeg is signed with a self-signed certificate, and Windows only
     installs packages signed with a certificate the machine trusts. This
-    script adds FFConvert.cer to the machine's Trusted People store, which
+    script adds WinFFmpeg.cer to the machine's Trusted People store, which
     needs administrator rights once, and then installs the package. Later
     versions signed with the same certificate install without elevation.
 
@@ -62,12 +62,12 @@ if (-not (Test-Trusted)) {
 
 # A copy registered from a build folder ("build.ps1 -Register") has the same
 # identity and would block the install.
-Get-AppxPackage -Name FFConvert | Where-Object IsDevelopmentMode | Remove-AppxPackage -PreserveApplicationData
+Get-AppxPackage -Name WinFFmpeg | Where-Object IsDevelopmentMode | Remove-AppxPackage -PreserveApplicationData
 
 Write-Host 'Installing...'
 # Development builds are numbered below every release, so going from one to
 # the other can be a downgrade, which Windows refuses unless told otherwise.
 Add-AppxPackage -Path $Package -ForceApplicationShutdown -ForceUpdateFromAnyVersion
 
-$installed = Get-AppxPackage -Name FFConvert
-Write-Host "Installed FFConvert $($installed.Version). Right-click a video, audio or image file to use it."
+$installed = Get-AppxPackage -Name WinFFmpeg
+Write-Host "Installed WinFFmpeg $($installed.Version). Right-click a video, audio or image file to use it."

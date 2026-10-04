@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    One-time machine setup for building FFConvert. Must run elevated.
+    One-time machine setup for building WinFFmpeg. Must run elevated.
 
 .DESCRIPTION
     - Installs the .NET 10 SDK (winget).
@@ -13,7 +13,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$LogPath = (Join-Path $env:TEMP 'ffconvert-setup.log')
+    [string]$LogPath = (Join-Path $env:TEMP 'winffmpeg-setup.log')
 )
 
 $ErrorActionPreference = 'Stop'

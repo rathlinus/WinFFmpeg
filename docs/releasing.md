@@ -13,15 +13,15 @@ The tag has to have the form `v<major>.<minor>.<patch>`. Pushing it starts the R
 
 | File | Contents |
 |---|---|
-| `FFConvert-1.2.0-x64.zip` | the package, the certificate and `Install.ps1`. This is the download the README points to. |
-| `FFConvert-1.2.0-x64.msix` | the package on its own |
-| `FFConvert.cer` | the public half of the signing certificate |
+| `WinFFmpeg-1.2.0-x64.zip` | the package, the certificate and `Install.ps1`. This is the download the README points to. |
+| `WinFFmpeg-1.2.0-x64.msix` | the package on its own |
+| `WinFFmpeg.cer` | the public half of the signing certificate |
 
 GitHub generates the release notes from the changes since the previous tag.
 
 ## The signing certificate
 
-Windows installs a package only when it trusts the certificate that signed it. FFConvert uses a self-signed certificate, so each user trusts it once through `Install.ps1`. That only stays a one-time step if every release is signed with the same certificate.
+Windows installs a package only when it trusts the certificate that signed it. WinFFmpeg uses a self-signed certificate, so each user trusts it once through `Install.ps1`. That only stays a one-time step if every release is signed with the same certificate.
 
 The workflow reads the certificate from two repository secrets:
 
@@ -35,14 +35,14 @@ Without these secrets the workflow still produces a release, signed with a certi
 To store the certificate `scripts\sign.ps1` created on your machine:
 
 ```powershell
-$certificate = Get-ChildItem Cert:\CurrentUser\My | Where-Object Subject -eq 'CN=FFConvert'
+$certificate = Get-ChildItem Cert:\CurrentUser\My | Where-Object Subject -eq 'CN=WinFFmpeg'
 $password = Read-Host -AsSecureString 'Password for the PFX file'
-Export-PfxCertificate -Cert $certificate -FilePath FFConvert.pfx -Password $password
+Export-PfxCertificate -Cert $certificate -FilePath WinFFmpeg.pfx -Password $password
 
-[Convert]::ToBase64String([IO.File]::ReadAllBytes('FFConvert.pfx')) | gh secret set SIGNING_CERTIFICATE_PFX
+[Convert]::ToBase64String([IO.File]::ReadAllBytes('WinFFmpeg.pfx')) | gh secret set SIGNING_CERTIFICATE_PFX
 gh secret set SIGNING_CERTIFICATE_PASSWORD    # asks for the password
 
-Remove-Item FFConvert.pfx
+Remove-Item WinFFmpeg.pfx
 ```
 
 Treat the PFX file like a password. Whoever has it can sign packages that your users' machines will install without asking.

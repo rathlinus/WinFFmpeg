@@ -26,7 +26,7 @@ jobs:
         run: choco install ffmpeg --no-progress -y
 
       - name: Test
-        run: dotnet test tests/FFConvert.Core.Tests
+        run: dotnet test tests/WinFFmpeg.Core.Tests
 
       # Puts the certificate where sign.ps1 looks for it. Without the secret,
       # sign.ps1 creates a certificate for this run only.
@@ -53,6 +53,6 @@ jobs:
         run: |
           $version = $env:GITHUB_REF_NAME.TrimStart('v')
           $files = (Get-ChildItem artifacts\release -File).FullName
-          $notes = "Download ``FFConvert-$version-x64.zip``, extract it and run ``Install.ps1``. The README has the details."
-          gh release create $env:GITHUB_REF_NAME $files --title "FFConvert $version" --notes $notes --generate-notes --verify-tag
+          $notes = "Download ``WinFFmpeg-$version-x64.zip``, extract it and run ``Install.ps1``. The README has the details."
+          gh release create $env:GITHUB_REF_NAME $files --title "WinFFmpeg $version" --notes $notes --generate-notes --verify-tag
           if ($LASTEXITCODE -ne 0) { throw 'Creating the release failed.' }
