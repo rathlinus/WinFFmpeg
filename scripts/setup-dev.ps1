@@ -8,6 +8,7 @@
       unsigned from a loose folder during development.
     - Adds the MSVC x64 toolset to Visual Studio Build Tools 2022, which
       the Native AOT linker needs for the shell extension.
+    - Installs Inno Setup (winget), which compiles the setup program.
 
     Each step is skipped when it is already satisfied.
 #>
@@ -49,6 +50,28 @@ try {
     }
 } catch {
     Write-Log "dotnet10: FAILED $($_.Exception.Message)"
+    $failed = $true
+}
+
+# --- Inno Setup ----------------------------------------------------------
+try {
+    $compiler = @(
+        (Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup *\ISCC.exe'),
+        (Join-Path ${env:ProgramFiles(x86)} 'Inno Setup *\ISCC.exe'),
+        (Join-Path $env:ProgramFiles 'Inno Setup *\ISCC.exe')
+    ) | ForEach-Object { Get-ChildItem $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+
+    if ($compiler) {
+        Write-Log "innosetup: already installed at $($compiler.FullName)"
+    } else {
+        Write-Log 'innosetup: installing'
+        & winget install --id JRSoftware.InnoSetup --exact --silent `
+            --accept-package-agreements --accept-source-agreements --disable-interactivity | Out-Null
+        Write-Log "innosetup: winget exit code $LASTEXITCODE"
+        if ($LASTEXITCODE -ne 0) { $failed = $true }
+    }
+} catch {
+    Write-Log "innosetup: FAILED $($_.Exception.Message)"
     $failed = $true
 }
 

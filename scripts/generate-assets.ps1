@@ -102,6 +102,25 @@ foreach ($size in 16, 24, 32, 48, 256) {
     Save-Png "Square44x44Logo.targetsize-${size}_altform-lightunplated.png" $size $size $size
 }
 
+# The two pictures the setup wizard shows: the panel beside the welcome and finish
+# pages, and the small one in the corner of the others. Inno Setup wants bitmaps
+# without transparency, so the logo is drawn onto a solid background. Both are
+# twice the size the wizard uses at 100%, which keeps them sharp on scaled displays.
+function Save-WizardBitmap([string]$Name, [int]$Width, [int]$Height, [double]$IconSize, [double]$IconTop, [System.Drawing.Color]$Background) {
+    $bitmap = New-Object System.Drawing.Bitmap $Width, $Height, ([System.Drawing.Imaging.PixelFormat]::Format24bppRgb)
+    $g = [System.Drawing.Graphics]::FromImage($bitmap)
+    $g.Clear($Background)
+    $logo = New-IconBitmap ([int]$IconSize) ([int]$IconSize) $IconSize
+    $g.DrawImage($logo, [int](($Width - $IconSize) / 2), [int]$IconTop, [int]$IconSize, [int]$IconSize)
+    $logo.Dispose(); $g.Dispose()
+    $bitmap.Save((Join-Path $packagingFolder $Name), [System.Drawing.Imaging.ImageFormat]::Bmp)
+    $bitmap.Dispose()
+}
+
+$packagingFolder = (Resolve-Path (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\packaging')).Path
+Save-WizardBitmap 'installer-side.bmp' 328 628 168 150 ([System.Drawing.Color]::FromArgb(255, 32, 32, 32))
+Save-WizardBitmap 'installer-small.bmp' 110 110 94 8 ([System.Drawing.Color]::White)
+
 # AppIcon.ico: PNG-compressed entries, which Windows has supported since Vista.
 $sizes = 16, 24, 32, 48, 64, 256
 $images = foreach ($size in $sizes) {

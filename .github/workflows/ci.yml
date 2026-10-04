@@ -23,18 +23,23 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      # The conversion tests run ffmpeg; without it they pass without checking anything.
-      - name: Install ffmpeg
-        run: choco install ffmpeg --no-progress -y
+      # ffmpeg for the conversion tests, which pass without checking anything when it
+      # is missing. Inno Setup compiles the setup program.
+      - name: Install ffmpeg and Inno Setup
+        run: choco install ffmpeg innosetup --no-progress -y
 
       - name: Test
         run: dotnet test tests/WinFFmpeg.Core.Tests
 
+      # The same script the release workflow runs, so a broken release shows up here
+      # and not after a tag is pushed. The version is a placeholder, and the files are
+      # signed with a certificate made for this run, so they are not kept.
       # Windows PowerShell, because that is what the scripts are written for and tested with.
-      - name: Build the package
+      - name: Build the release files
         shell: powershell
-        run: scripts\build.ps1
+        run: scripts\release.ps1 -Version 0.0.1
 
+      # The unsigned package is enough to inspect what a change produced.
       - uses: actions/upload-artifact@v7
         with:
           name: WinFFmpeg-unsigned

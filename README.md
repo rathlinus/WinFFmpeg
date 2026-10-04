@@ -43,16 +43,20 @@ What the menu offers depends on the selection:
 
 You need 64-bit Windows 11 and ffmpeg. If ffmpeg is missing, `winget install Gyan.FFmpeg` installs it.
 
-1. Download `WinFFmpeg-<version>-x64.zip` from the [releases page](https://github.com/rathlinus/WinFFmpeg/releases) and extract it.
-2. Open a terminal in the extracted folder and run:
+Download `WinFFmpeg-<version>-Setup.exe` from the [releases page](https://github.com/rathlinus/WinFFmpeg/releases) and run it.
 
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File Install.ps1
-   ```
+<p align="center">
+  <img src="docs/screenshots/setup.png" width="520" alt="The first page of the WinFFmpeg setup wizard, with the logo and an Install button">
+</p>
 
-The package is signed with a self-signed certificate, which Windows does not trust on its own. `Install.ps1` adds the certificate to the machine's Trusted People store and then installs the package. Adding the certificate needs administrator rights, so expect one prompt. Later versions signed with the same certificate install without it.
+WinFFmpeg is signed with a self-signed certificate, which Windows does not know. Two prompts can come from that:
+
+- Windows SmartScreen may stop the setup program with "Windows protected your PC". Choose **More info**, then **Run anyway**.
+- Setup asks for administrator rights once, to add the certificate to the machine's Trusted People store. Later versions signed with the same certificate install without that prompt.
 
 To uninstall, open Settings, go to Apps, then Installed apps, and remove WinFFmpeg.
+
+The release also has `WinFFmpeg-<version>-x64.zip` for installing without a setup program: extract it and run `powershell -ExecutionPolicy Bypass -File Install.ps1` in that folder. Setup runs the same script. For an unattended install, run the setup program with `/VERYSILENT`.
 
 ## Build from source
 
@@ -61,6 +65,6 @@ scripts\setup-dev.ps1        # once, from an elevated prompt
 scripts\install.ps1 -Build   # build, sign and install
 ```
 
-`setup-dev.ps1` installs the .NET 10 SDK and the MSVC toolset and turns on Developer Mode. [docs/development.md](docs/development.md) explains the projects, the scripts and how a click in Explorer ends up as an ffmpeg process. [docs/releasing.md](docs/releasing.md) covers publishing a version.
+`setup-dev.ps1` installs the .NET 10 SDK, the MSVC toolset and Inno Setup, and turns on Developer Mode. [docs/development.md](docs/development.md) explains the projects, the scripts and how a click in Explorer ends up as an ffmpeg process. [docs/releasing.md](docs/releasing.md) covers publishing a version.
 
 WinFFmpeg is an independent project and is not affiliated with FFmpeg or Microsoft.

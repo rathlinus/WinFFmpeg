@@ -22,8 +22,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Install ffmpeg
-        run: choco install ffmpeg --no-progress -y
+      # ffmpeg for the conversion tests, Inno Setup for the setup program.
+      - name: Install ffmpeg and Inno Setup
+        run: choco install ffmpeg innosetup --no-progress -y
 
       - name: Test
         run: dotnet test tests/WinFFmpeg.Core.Tests
@@ -53,6 +54,6 @@ jobs:
         run: |
           $version = $env:GITHUB_REF_NAME.TrimStart('v')
           $files = (Get-ChildItem artifacts\release -File).FullName
-          $notes = "Download ``WinFFmpeg-$version-x64.zip``, extract it and run ``Install.ps1``. The README has the details."
+          $notes = "Download ``WinFFmpeg-$version-Setup.exe`` and run it. Windows SmartScreen warns about it because the certificate is self-signed; choose **More info**, then **Run anyway**. The README has the details and the other ways to install."
           gh release create $env:GITHUB_REF_NAME $files --title "WinFFmpeg $version" --notes $notes --generate-notes --verify-tag
           if ($LASTEXITCODE -ne 0) { throw 'Creating the release failed.' }

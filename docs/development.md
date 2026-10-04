@@ -2,11 +2,12 @@
 
 ## Setup
 
-Run `scripts\setup-dev.ps1` once from an elevated PowerShell. It does three things and skips each one that is already in place:
+Run `scripts\setup-dev.ps1` once from an elevated PowerShell. It does four things and skips each one that is already in place:
 
 - installs the .NET 10 SDK with winget
 - turns on Windows Developer Mode, which allows registering an unsigned package from a folder
 - adds the MSVC x64 toolset to Visual Studio Build Tools 2022, or installs the Build Tools when they are missing. The Native AOT compiler needs its linker.
+- installs Inno Setup with winget, which compiles the setup program
 
 The conversion tests also need ffmpeg on `PATH`.
 
@@ -18,9 +19,10 @@ The conversion tests also need ffmpeg on `PATH`.
 | `scripts\build.ps1 -Register` | Also unpacks the package to `artifacts\layout` and registers it from there. This is the quick loop while developing. |
 | `scripts\sign.ps1` | Signs the package with the `CN=WinFFmpeg` certificate from your user store and creates that certificate when there is none. |
 | `scripts\install.ps1 -Build` | Builds, signs and installs. |
-| `scripts\release.ps1 -Version 1.2.0` | Builds and signs a release and collects its files in `artifacts\release`. |
-| `scripts\generate-assets.ps1` | Draws the app icon in every size the manifest needs. Run it only to change the icon. |
-| `packaging\Install.ps1` | The installer that ships in a release. `install.ps1` calls the same script. |
+| `scripts\release.ps1 -Version 1.2.0` | Builds and signs a release, compiles the setup program and collects the files in `artifacts\release`. |
+| `scripts\generate-assets.ps1` | Draws the logo in every size the manifest needs, and the two pictures of the setup wizard. Run it only to change the logo. |
+| `packaging\Install.ps1` | Trusts the certificate and installs the package. The setup program, the zip download and `install.ps1` all run this one script. |
+| `packaging\WinFFmpeg.iss` | The Inno Setup script of the setup program. [releasing.md](releasing.md) describes what it does. |
 
 The library and the tests build on their own with `dotnet build` and `dotnet test`. The app project needs the published shell extension and stops with an error without it, so build the app with `build.ps1`.
 
