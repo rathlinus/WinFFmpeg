@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch makes the older run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      # The conversion tests run ffmpeg; without it they pass without checking anything.
+      - name: Install ffmpeg
+        run: choco install ffmpeg --no-progress -y
+
+      - name: Test
+        run: dotnet test tests/FFConvert.Core.Tests
+
+      # Windows PowerShell, because that is what the scripts are written for and tested with.
+      - name: Build the package
+        shell: powershell
+        run: scripts\build.ps1
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: FFConvert-unsigned
+          path: artifacts/FFConvert.msix
+          if-no-files-found: error

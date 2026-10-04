@@ -1,0 +1,58 @@
+name: Release
+
+# Pushing a tag such as v1.2.0 builds, signs and publishes that version.
+# docs/releasing.md describes the process and the two signing secrets.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      # At job level so the "if" of the import step can see whether it is set.
+      SIGNING_CERTIFICATE_PFX: ${{ secrets.SIGNING_CERTIFICATE_PFX }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install ffmpeg
+        run: choco install ffmpeg --no-progress -y
+
+      - name: Test
+        run: dotnet test tests/FFConvert.Core.Tests
+
+      # Puts the certificate where sign.ps1 looks for it. Without the secret,
+      # sign.ps1 creates a certificate for this run only.
+      - name: Import the signing certificate
+        if: env.SIGNING_CERTIFICATE_PFX != ''
+        shell: powershell
+        env:
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          $path = Join-Path $env:RUNNER_TEMP 'signing.pfx'
+          [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($env:SIGNING_CERTIFICATE_PFX))
+          $password = ConvertTo-SecureString $env:SIGNING_CERTIFICATE_PASSWORD -AsPlainText -Force
+          Import-PfxCertificate -FilePath $path -CertStoreLocation Cert:\CurrentUser\My -Password $password | Out-Null
+          Remove-Item $path
+
+      - name: Build and sign
+        shell: powershell
+        run: scripts\release.ps1 -Version ($env:GITHUB_REF_NAME.TrimStart('v'))
+
+      - name: Publish the release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          $files = (Get-ChildItem artifacts\release -File).FullName
+          $notes = "Download ``FFConvert-$version-x64.zip``, extract it and run ``Install.ps1``. The README has the details."
+          gh release create $env:GITHUB_REF_NAME $files --title "FFConvert $version" --notes $notes --generate-notes --verify-tag
+          if ($LASTEXITCODE -ne 0) { throw 'Creating the release failed.' }
